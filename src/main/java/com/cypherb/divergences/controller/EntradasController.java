@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/entradas")
+@RequestMapping("/entradas")
 @RequiredArgsConstructor
 public class EntradasController {
 
