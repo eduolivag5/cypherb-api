@@ -1,9 +1,12 @@
 package com.cypherb.divergences.service;
 
+import com.cypherb.divergences.dto.SuscripcionResponseDTO;
 import com.cypherb.divergences.model.Monedas;
 import com.cypherb.divergences.model.Suscripcion;
+import com.cypherb.divergences.model.Usuario; // Asegúrate de importar tu entidad Usuario
 import com.cypherb.divergences.repository.MonedasRepository;
 import com.cypherb.divergences.repository.SuscripcionRepository;
+import com.cypherb.divergences.repository.UsuarioRepository; // Asegúrate de importar tu repositorio de usuarios
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,7 @@ public class SuscripcionService {
 
     private final SuscripcionRepository suscripcionRepository;
     private final MonedasRepository monedasRepository;
+    private final UsuarioRepository usuarioRepository; // <-- Inyectamos el repositorio de usuarios
 
     @Transactional
     public Suscripcion crearSuscripcion(Long usuarioId, String simbolo) {
@@ -35,13 +39,30 @@ public class SuscripcionService {
     }
 
     @Transactional(readOnly = true)
-    public List obtenerPorUsuario(Long usuarioId) {
-        return suscripcionRepository.findByUsuarioId(usuarioId);
+    public List<SuscripcionResponseDTO> obtenerTodas() {
+        return suscripcionRepository.findAll().stream()
+                .map(s -> {
+                    // Buscamos el chatId del usuario correspondiente
+                    Long chatId = usuarioRepository.findById(s.getUsuarioId())
+                            .map(Usuario::getChatId) // Asume que tu entidad Usuario tiene getChatId()
+                            .orElse(null);
+
+                    return new SuscripcionResponseDTO(s.getId(), s.getUsuarioId(), chatId, s.getMoneda());
+                })
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List obtenerTodas() {
-        return suscripcionRepository.findAll();
+    public List<SuscripcionResponseDTO> obtenerPorUsuario(Long usuarioId) {
+        // Opcional: si ya sabemos el usuarioId, podríamos buscar el chatId una sola vez fuera del stream,
+        // pero hacerlo así mantiene la consistencia del mapper.
+        Long chatId = usuarioRepository.findById(usuarioId)
+                .map(Usuario::getChatId)
+                .orElse(null);
+
+        return suscripcionRepository.findByUsuarioId(usuarioId).stream()
+                .map(s -> new SuscripcionResponseDTO(s.getId(), s.getUsuarioId(), chatId, s.getMoneda()))
+                .toList();
     }
 
     @Transactional

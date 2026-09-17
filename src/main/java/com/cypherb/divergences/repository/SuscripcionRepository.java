@@ -11,11 +11,14 @@ import java.util.Optional;
 @Repository
 public interface SuscripcionRepository extends JpaRepository<Suscripcion, Long> {
 
-    List findByUsuarioId(Long usuarioId);
+    // Añadido <Suscripcion>
+    List<Suscripcion> findByUsuarioId(Long usuarioId);
 
-    List findByMoneda(Monedas moneda);
+    // Añadido <Suscripcion>
+    List<Suscripcion> findByMoneda(Monedas moneda);
 
-    Optional findByUsuarioIdAndMoneda(Long usuarioId, Monedas moneda);
+    // Añadido <Suscripcion>
+    Optional<Suscripcion> findByUsuarioIdAndMoneda(Long usuarioId, Monedas moneda);
 
     boolean existsByUsuarioIdAndMoneda(Long usuarioId, Monedas moneda);
 }
