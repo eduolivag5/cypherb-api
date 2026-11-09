@@ -1,5 +1,6 @@
 package com.cypherb.divergences.controller;
 
+import com.cypherb.divergences.dto.RespuestaListadoDTO;
 import com.cypherb.divergences.model.Operaciones;
 import com.cypherb.divergences.service.OperacionesService;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +31,8 @@ public class OperacionesController {
 
     /** Lista todas las operaciones, o solo las de un estado (?estado=ABIERTA). */
     @GetMapping
-    public List<Operaciones> listar(@RequestParam(required = false) Operaciones.Estado estado) {
-        return operacionesService.listar(estado);
+    public RespuestaListadoDTO<Operaciones> listar(@RequestParam(required = false) Operaciones.Estado estado) {
+        return RespuestaListadoDTO.de(operacionesService.listar(estado));
     }
 
     @GetMapping("/{id}")
